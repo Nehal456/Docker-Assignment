@@ -1,0 +1,19 @@
+# Node 
+node_modules/
+npm-debug.log
+
+# python
+__pycache__/
+*.pyc 
+*.pyo 
+*.pyd 
+.Python 
+env/
+venv
+
+# IDE
+.vscode/
+.idea
+
+#Docker
+*.log 

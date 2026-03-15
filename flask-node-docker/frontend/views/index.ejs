@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Flask Assignment 2</title>
+
+    </head>
+    <h1>Submit Your Details</h1>
+    <form id="dataForm">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required><br><br>
+        <label for="email">Email</label>
+        <label for="email" id="email" name="email" required></label><br>
+        <input type="text" id="email" name="email" required><br><br>
+    </form>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById('dataForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const name = document.getElementById('email').value;
+
+            // Use the backend serverice name as defined in docker-compose.yml
+            const backendUrl = 'https://backend:5000/submit';
+
+            try {
+                const response = await fetch(backendUrl, {
+                    method: 'POST',
+                    header: {
+                        'Content-Type': 'application/json',
+
+                    },
+                    body: JSON.stringify({ name, email})
+                }),
+                const result = await response.json();
+                document.getElementById('response').innerText = result.message;
+
+            } catch (error) {
+                document.getElementsById('response').innerText = 'Error:' + error;
+            }
+        });
+        </script>
+        </body>
+
+</html>
