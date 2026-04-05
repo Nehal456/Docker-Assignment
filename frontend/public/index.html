@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Form</title>
+</head>
+<body>
+    <h2>Registration</h2>
+    <form id="myForm">
+        <input type="text" name="name" id="name" placeholder="Enter Your Name" required><br>
+        <input type="text" name="email" id="email" placeholder="Enter Your Email" required><br>
+        <input type="submit" value="Submit">
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('myForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            const response = await fetch('/submit-form', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email })
+            });
+            const data = await response.json();
+            if (data.message) {
+                document.getElementById('result').innerHTML = `<h3>${data.message}</h3>`;
+            } else {
+                document.getElementById('result').innerHTML = `<h3 style="color:red">Error: ${data.error}</h3>`;
+            }
+        });
+    </script>
+</body>
+</html>
