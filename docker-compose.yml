@@ -12,6 +12,8 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    environment:
+      - BACKENDURL=http://backend:5000
     networks:
       - my-network
 
