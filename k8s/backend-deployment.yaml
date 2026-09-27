@@ -1,25 +1,61 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: flask-backend
-
+  labels:
+    app: flask-backend
 spec:
-  replicas: 1
-
+  replicas: 2
   selector:
     matchLabels:
       app: flask-backend
-
   template:
     metadata:
       labels:
         app: flask-backend
-
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+
       containers:
         - name: flask-backend
-          image: flask-backend:latest
+          image: flask-backend:1.0.0
           imagePullPolicy: IfNotPresent
+
           ports:
             - containerPort: 5000
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3

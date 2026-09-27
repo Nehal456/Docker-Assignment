@@ -1,11 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: express-frontend
+  labels:
+    app: express-frontend
 
 spec:
-  replicas: 1
+  replicas: 2
 
   selector:
     matchLabels:
@@ -17,12 +18,53 @@ spec:
         app: express-frontend
 
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+
       containers:
         - name: express-frontend
-          image: express-frontend:latest
+          image: express-frontend:1.0.0
           imagePullPolicy: IfNotPresent
+
           ports:
             - containerPort: 3000
+              protocol: TCP
+
           env:
-            - name: BACKENDURL
-              value: http://flask-backend:5000
+            - name: BACKEND_URL
+              value: "http://flask-backend:5000"
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3

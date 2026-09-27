@@ -4,21 +4,29 @@ const path = require('path');
 
 const app = express();
 
+const PORT = process.env.PORT || 3000;
+const BACKEND_URL = process.env.BACKEND_URL || 'http://flask-backend:5000';
+
 app.use(express.json());
 app.use(express.static(path.join(process.cwd(), 'public')));
 
-const backendUrl =
-    process.env.BACKENDURL ||
-    'http' + ':' + '//backend' + ':' + '5000';
+
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'healthy'
+    });
+});
+
 
 app.post('/submit-form', async (req, res) => {
     try {
         const response = await axios.post(
-            backendUrl + '/process',
+            `${BACKEND_URL}/process`,
             req.body
         );
 
         res.json(response.data);
+
     } catch (error) {
         console.error('Backend error:', error.message);
 
@@ -28,7 +36,8 @@ app.post('/submit-form', async (req, res) => {
     }
 });
 
-app.listen(3000, '0.0.0.0', () => {
-    console.log('Frontend running on port 3000');
-    console.log('Backend URL: ' + backendUrl);
-});k8s
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Frontend running on port ${PORT}`);
+    console.log(`Backend URL: ${BACKEND_URL}`);
+});
